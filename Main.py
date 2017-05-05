@@ -3,13 +3,18 @@ from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from Main_GUI import *
+from Load_Input import *
 
 
+class LoadInput(QWidget):
+    def __init__(self, parent=None):
+        QWidget.__init__(self, parent)
+        self.LoadInputGUI = Ui_LoadInput()
+        self.LoadInputGUI.setupUi(self)
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         QWidget.__init__(self,parent)
-        MainWindow = QtWidgets.QMainWindow()
         self.MainUi = Ui_MainWindow()
         self.MainUi.setupUi(self)
 
@@ -21,7 +26,7 @@ class MainWindow(QMainWindow):
 
     def windowaction(self):
         sub = QtWidgets.QMdiSubWindow()
-        Load_Input = self.MainUi.Load_Input
+        Load_Input = LoadInput()
         sub.setWidget(Load_Input)
         sub.setObjectName("Load_Input_window")
         sub.setWindowTitle("Load Input")
