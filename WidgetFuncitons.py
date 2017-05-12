@@ -168,6 +168,8 @@ class LoadInput(QWidget):
                     #Loads = {'LoadName' : [], 'Voltage': [], 'Wattage': [], 'PF': [], 'VA': [], 'Utility':[]}
         except:
             pass
+
+
 class VoltageDrop(QWidget):
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
@@ -193,6 +195,12 @@ class VoltageDrop(QWidget):
         self.hideOptions()
         self.VoltageDropGUI.comboBox_Panel_Voltage.activated[str].connect(self.phaseTotalShow)
         self.VoltageDropGUI.Button_Show_more_Options.clicked.connect(self.hideShowOptions)
+        self.VoltageDropGUI.UserInput_Length.textChanged[str].connect(self.Voltage_Drop_Change_Values)
+        self.VoltageDropGUI.comboBox_Wire_Type.activated[str].connect(self.Voltage_Drop_Change_Values)
+        self.VoltageDropGUI.comboBox_Wire_Size.activated[str].connect(self.WireSelect_Voltage_Drop)
+        self.VoltageDropGUI.comboBox_Phase.activated[str].connect(self.WireSelect_Voltage_Drop)
+
+
 
 
     def phaseTotalShow(self):
@@ -237,41 +245,42 @@ class VoltageDrop(QWidget):
         try:
             for i in range(0, len(Functions.Loads['Voltage'])):
                 self.VoltageDropGUI.text_Load_Name = QtWidgets.QLabel(self.VoltageDropGUI.scrollAreaWidgetContents)
-                self.VoltageDropGUI.text_Load_Name.setObjectName("text_Load_Name")
+                self.VoltageDropGUI.text_Load_Name.setObjectName("text_Load_Name-"+str(i))
                 self.VoltageDropGUI.gridLayout_Load_List.addWidget(self.VoltageDropGUI.text_Load_Name, i, 0, 1, 1)
-                self.VoltageDropGUI.text_Load_Name.setText("Test Load1")
+                self.VoltageDropGUI.text_Load_Name.setText(Functions.Loads['LoadName'][i])
 
                 self.VoltageDropGUI.text_equal = QtWidgets.QLabel(self.VoltageDropGUI.scrollAreaWidgetContents)
-                self.VoltageDropGUI.text_equal.setObjectName("text_equal")
+                self.VoltageDropGUI.text_equal.setObjectName("text_equal-"+str(i))
                 self.VoltageDropGUI.gridLayout_Load_List.addWidget(self.VoltageDropGUI.text_equal, i, 1, 1, 1)
                 self.VoltageDropGUI.text_equal.setText("=")
 
                 self.VoltageDropGUI.text_Load_Value = QtWidgets.QLabel(self.VoltageDropGUI.scrollAreaWidgetContents)
-                self.VoltageDropGUI.text_Load_Value.setObjectName("text_Load_Value")
+                self.VoltageDropGUI.text_Load_Value.setObjectName("text_Load_Value-"+str(i))
                 self.VoltageDropGUI.gridLayout_Load_List.addWidget(self.VoltageDropGUI.text_Load_Value, i, 2, 1, 1)
-                self.VoltageDropGUI.text_Load_Value.setText("200")
+                self.VoltageDropGUI.text_Load_Value.setText(Functions.Loads['VA'][i])
 
                 self.VoltageDropGUI.text_VA = QtWidgets.QLabel(self.VoltageDropGUI.scrollAreaWidgetContents)
-                self.VoltageDropGUI.text_VA.setObjectName("text_VA")
+                self.VoltageDropGUI.text_VA.setObjectName("text_VA-"+str(i))
                 self.VoltageDropGUI.gridLayout_Load_List.addWidget(self.VoltageDropGUI.text_VA, i, 3, 1, 1)
                 self.VoltageDropGUI.text_VA.setText("VA X")
 
                 self.VoltageDropGUI.UserInput_Num_Load = QtWidgets.QLineEdit(self.VoltageDropGUI.scrollAreaWidgetContents)
-                self.VoltageDropGUI.UserInput_Num_Load.setObjectName("UserInput_Num_Load")
+                self.VoltageDropGUI.UserInput_Num_Load.setObjectName("UserInput_Num_Load-"+str(i))
+                self.VoltageDropGUI.UserInput_Num_Load.textChanged[str].connect(self.TotalVA)
                 self.VoltageDropGUI.gridLayout_Load_List.addWidget(self.VoltageDropGUI.UserInput_Num_Load, i, 4, 1, 1)
 
                 self.VoltageDropGUI.text_at = QtWidgets.QLabel(self.VoltageDropGUI.scrollAreaWidgetContents)
-                self.VoltageDropGUI.text_at.setObjectName("text_at")
+                self.VoltageDropGUI.text_at.setObjectName("text_at"+str(i))
                 self.VoltageDropGUI.gridLayout_Load_List.addWidget(self.VoltageDropGUI.text_at, i, 5, 1, 1)
                 self.VoltageDropGUI.text_at.setText("at")
 
                 self.VoltageDropGUI.text_Load_Voltage = QtWidgets.QLabel(self.VoltageDropGUI.scrollAreaWidgetContents)
-                self.VoltageDropGUI.text_Load_Voltage.setObjectName("text_Load_Voltage")
+                self.VoltageDropGUI.text_Load_Voltage.setObjectName("text_Load_Voltage-"+str(i))
                 self.VoltageDropGUI.gridLayout_Load_List.addWidget(self.VoltageDropGUI.text_Load_Voltage, i, 6, 1, 1)
-                self.VoltageDropGUI.text_Load_Voltage.setText("120")
+                self.VoltageDropGUI.text_Load_Voltage.setText(Functions.Loads['Voltage'][i])
 
                 self.VoltageDropGUI.text_Voltage = QtWidgets.QLabel(self.VoltageDropGUI.scrollAreaWidgetContents)
-                self.VoltageDropGUI.text_Voltage.setObjectName("text_Voltage")
+                self.VoltageDropGUI.text_Voltage.setObjectName("text_Voltage-"+str(i))
                 self.VoltageDropGUI.gridLayout_Load_List.addWidget(self.VoltageDropGUI.text_Voltage, i, 7, 1, 1)
                 self.VoltageDropGUI.text_Voltage.setText("V")
 
@@ -279,3 +288,122 @@ class VoltageDrop(QWidget):
             # add message box to alert the user they need to add loads first
 
             pass
+
+    def TotalVA(self):
+        Total_Number_of_Loads = len(Functions.Loads['Voltage'])
+        total = 0
+
+        try:
+            for i in range(0,Total_Number_of_Loads):
+                numLoads_textBox = self.findChildren(QLineEdit, "UserInput_Num_Load-"+str(i))[0]
+                VA_text = self.findChildren(QLabel, "text_Load_Value-"+str(i))[0]
+                if numLoads_textBox.text() == '':
+                    numLoads_textBox = 0
+                else:
+                    numLoads_textBox = int(numLoads_textBox.text())
+                VA_text = int(VA_text.text())
+                subtotal= numLoads_textBox * VA_text
+                total = subtotal + total
+        except:
+            total = 0
+
+        self.VoltageDropGUI.text_Total_VA_RESULTS.setText(str(total))
+        voltage = self.circuitVoltage(Total_Number_of_Loads)
+        self.VoltageDropGUI.text_Circuit_Voltage_RESULTS.setText(str(voltage))
+
+        try:
+            current = round(total/voltage,2)
+            self.VoltageDropGUI.text_Total_Current_RESULTS.setText(str(current))
+        except:
+            self.VoltageDropGUI.text_Total_Current_RESULTS.setText(str(0))
+
+    def circuitVoltage(self,totalLoads):
+        total = 0
+        try:
+            for i in range(0, totalLoads):
+                Voltage_of_Circuit = self.findChildren(QLabel, "text_Load_Voltage-"+str(i))[0]
+                Voltage_of_Circuit = int(Voltage_of_Circuit.text())
+                total = Voltage_of_Circuit + total
+                #pdb.set_trace()
+        except:
+            total = 0
+
+        try:
+            CheckVoltage = total/totalLoads
+        except:
+            CheckVoltage = 0
+
+        return CheckVoltage
+
+            #print(str(total))
+
+    def Voltage_Drop_Calc_Auto_Wire_Size(self,Distance,wireType,Phase,Current,circuitVoltage):
+    
+        for i in range(0,len(Functions.wireSizeCircularMill)):
+            VoltageDrop = round((self.PhaseCheck(Phase) * self.CUorAL(wireType) * float(Current) * float(Distance))/Functions.wireSizeCircularMill[i],2)
+            VoltageDropPre = VoltageDrop/float(circuitVoltage)
+
+            if VoltageDropPre < 0.03:
+                break
+
+            #print('Phase: ' +str(self.PhaseCheck(Phase)))
+            #print('CUorAL:' +str(self.CUorAL(wireType)))
+            #print('Current: '+ str(Current))
+            #print('Distance: '+ str(Distance))
+            #print('Wire Size Mills' + str(wireSizeCircularMill[i]))
+
+        return [VoltageDrop,VoltageDropPre,i]
+
+    def CUorAL(self,input):
+        if input == 'CU':
+            output = 12.9
+        else:
+            output = 21.2
+        return output
+
+    def PhaseCheck(self,input):
+        if input == '1':
+            output = 2
+        else:
+            output = 1.732
+        return output
+
+    def Voltage_Drop_Change_Values(self):
+        # This is for it automaticaly selecting the wire size and changing the values on the form
+        try:
+            Distance = self.VoltageDropGUI.UserInput_Length.text()
+            wireType = self.VoltageDropGUI.comboBox_Wire_Type.currentText()
+            Phase = self.VoltageDropGUI.comboBox_Phase.currentText()
+            Current = self.VoltageDropGUI.text_Total_Current_RESULTS.text()
+            circuitVoltage = self.VoltageDropGUI.text_Circuit_Voltage_RESULTS.text()
+
+            Voltage_calcs = self.Voltage_Drop_Calc_Auto_Wire_Size(Distance,wireType,Phase,Current,circuitVoltage)
+
+            self.VoltageDropGUI.text_Total_Voltage_Drop_RESULTS.setText(str(Voltage_calcs[0]))
+            self.VoltageDropGUI.text_Pre_Voltage_Drop_2.setText(str(round(Voltage_calcs[1]*100,2)))
+            self.VoltageDropGUI.comboBox_Wire_Size.setCurrentIndex(Voltage_calcs[2])
+            self.VoltageDropGUI.Text_Wire_Size_RESULTS.setText(self.VoltageDropGUI.comboBox_Wire_Size.currentText())
+        except:
+            pass
+
+    def Voltage_Drop_Calc(self,Distance,wireType,Phase,Current,circuitVoltage,WireSizeIndex):
+        #This is just the pure VoltageDrop Calculation
+        VoltageDrop = round((self.PhaseCheck(Phase) * self.CUorAL(wireType) * float(Current) * float(Distance))/Functions.wireSizeCircularMill[WireSizeIndex],2)
+        VoltageDropPre = VoltageDrop/float(circuitVoltage)
+        return [VoltageDrop,VoltageDropPre]
+
+    def WireSelect_Voltage_Drop(self):
+        #print('made it')
+        #pdb.set_trace()
+        if self.VoltageDropGUI.Button_Show_more_Options.text() =='Hide Options':
+            Distance = self.VoltageDropGUI.UserInput_Length.text()
+            wireType = self.VoltageDropGUI.comboBox_Wire_Type.currentText()
+            Phase = self.VoltageDropGUI.comboBox_Phase.currentText()
+            Current = self.VoltageDropGUI.text_Total_Current_RESULTS.text()
+            circuitVoltage = self.VoltageDropGUI.text_Circuit_Voltage_RESULTS.text()
+            currentWireSize = self.VoltageDropGUI.comboBox_Wire_Size.currentIndex()
+
+            Voltage_calcs = self.Voltage_Drop_Calc(Distance,wireType,Phase,Current,circuitVoltage,currentWireSize)
+            self.VoltageDropGUI.text_Total_Voltage_Drop_RESULTS.setText(str(Voltage_calcs[0]))
+            self.VoltageDropGUI.text_Pre_Voltage_Drop_2.setText(str(round(Voltage_calcs[1]*100,2)))
+            self.VoltageDropGUI.Text_Wire_Size_RESULTS.setText(self.VoltageDropGUI.comboBox_Wire_Size.currentText())
