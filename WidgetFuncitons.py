@@ -24,6 +24,7 @@ class LoadInput(QWidget):
         self.modifyTableIndex = 0
 
 
+
     def setUpLoadInputUi(self):
         self.LoadInputGUI.Button_Add_To_Window.clicked.connect(self.sendToLoadTable)
         self.LoadInputGUI.UserInput_Wattage.textChanged[str].connect(self.getVA)
@@ -137,7 +138,7 @@ class LoadInput(QWidget):
         Functions.Loads['VA'][self.modifyTableIndex] = VA
         Functions.Loads['Utility'][self.modifyTableIndex] = Utility
 
-        pdb.set_trace()
+        #pdb.set_trace()
 
     def getVA(self):
 
@@ -189,6 +190,7 @@ class VoltageDrop(QWidget):
         self.setUpVoltageDropUi()
         self.phaseTotalShow()
         self.LoadInputs()
+        self.current_Panel = {'cktNumber':[],'cktInfo':[]}
 
 
     def setUpVoltageDropUi(self):
@@ -199,8 +201,8 @@ class VoltageDrop(QWidget):
         self.VoltageDropGUI.comboBox_Wire_Type.activated[str].connect(self.Voltage_Drop_Change_Values)
         self.VoltageDropGUI.comboBox_Wire_Size.activated[str].connect(self.WireSelect_Voltage_Drop)
         self.VoltageDropGUI.comboBox_Phase.activated[str].connect(self.WireSelect_Voltage_Drop)
-
-
+        self.VoltageDropGUI.Button_Save.clicked.connect(self.saveVoltageDrop)
+        self.VoltageDropGUI.Button_Add_To_Table.clicked.connect(self.addToTable)
 
 
     def phaseTotalShow(self):
@@ -317,6 +319,11 @@ class VoltageDrop(QWidget):
         except:
             self.VoltageDropGUI.text_Total_Current_RESULTS.setText(str(0))
 
+        try:
+            self.Voltage_Drop_Change_Values()
+        except:
+            pass
+
     def circuitVoltage(self,totalLoads):
         total = 0
         try:
@@ -338,7 +345,7 @@ class VoltageDrop(QWidget):
             #print(str(total))
 
     def Voltage_Drop_Calc_Auto_Wire_Size(self,Distance,wireType,Phase,Current,circuitVoltage):
-    
+
         for i in range(0,len(Functions.wireSizeCircularMill)):
             VoltageDrop = round((self.PhaseCheck(Phase) * self.CUorAL(wireType) * float(Current) * float(Distance))/Functions.wireSizeCircularMill[i],2)
             VoltageDropPre = VoltageDrop/float(circuitVoltage)
@@ -407,3 +414,64 @@ class VoltageDrop(QWidget):
             self.VoltageDropGUI.text_Total_Voltage_Drop_RESULTS.setText(str(Voltage_calcs[0]))
             self.VoltageDropGUI.text_Pre_Voltage_Drop_2.setText(str(round(Voltage_calcs[1]*100,2)))
             self.VoltageDropGUI.Text_Wire_Size_RESULTS.setText(self.VoltageDropGUI.comboBox_Wire_Size.currentText())
+
+    def addToTable(self):
+#To add: check if the same circuit number is entered and deny it
+#change order so that wire size if closer to the front
+# add the total amount to the bottom phase boxes
+        if len(self.VoltageDropGUI.UserInput_Circuit_Number.text()) > 0:
+
+            circuitNumber = self.VoltageDropGUI.UserInput_Circuit_Number.text()
+            length = self.VoltageDropGUI.UserInput_Length.text()
+            total_VA = self.VoltageDropGUI.text_Total_VA_RESULTS.text()
+            circuitVoltage = self.VoltageDropGUI.text_Circuit_Voltage_RESULTS.text()
+            current = self.VoltageDropGUI.text_Total_Current_RESULTS.text()
+            wire_size = self.VoltageDropGUI.comboBox_Wire_Size.currentText()
+            wire_type = self.VoltageDropGUI.comboBox_Wire_Type.currentText()
+            wire_insulation = self.VoltageDropGUI.comboBox_Wire_Insulation.currentText()
+            phase = self.VoltageDropGUI.comboBox_Phase.currentText()
+            total_voltage_drop = self.VoltageDropGUI.text_Total_Voltage_Drop_RESULTS.text()
+            pre_V_Drop = self.VoltageDropGUI.text_Pre_Voltage_Drop_2.text()
+            load_type = self.VoltageDropGUI.comboBox_Load_Type.currentText()
+            phase = self.VoltageDropGUI.comboBox_Phase.currentText()
+
+
+            num_of_lum = {'Lum_name':[],'lum_QTY':[]}
+
+            for i in range(0, len(Functions.Loads['Voltage'])):
+                numLoads = self.findChildren(QLineEdit, "UserInput_Num_Load-"+str(i))[0]
+                Load_Name = self.findChildren(QLabel, "text_Load_Name-"+str(i))[0]
+                num_of_lum['Lum_name'].append(Load_Name.text())
+                num_of_lum['lum_QTY'].append(numLoads.text())
+
+            current_circuit = {'Length':length,'total_VA':total_VA,'circuit_Voltage':circuitVoltage,'current':current,'wire_size':wire_size,'wire_type':wire_type,'wire_insulation':wire_insulation,'phase':phase,'total_voltage_drop':total_voltage_drop,'pre_V_Drop':pre_V_Drop,'load_type':load_type,'Num_of_lum':num_of_lum}
+            self.current_Panel['cktNumber'].append(self.VoltageDropGUI.UserInput_Circuit_Number.text())
+            self.current_Panel['cktInfo'].append(current_circuit)
+
+            rowPosition = self.VoltageDropGUI.tableWidget.rowCount()
+            self.VoltageDropGUI.tableWidget.insertRow(rowPosition)
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 0, QTableWidgetItem(circuitNumber))
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 1, QTableWidgetItem(length))
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 2, QTableWidgetItem(total_VA))
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 3, QTableWidgetItem(circuitVoltage))
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 4, QTableWidgetItem(current))
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 5, QTableWidgetItem(wire_size))
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 6, QTableWidgetItem(wire_type))
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 7, QTableWidgetItem(wire_insulation))
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 8, QTableWidgetItem(phase))
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 9, QTableWidgetItem(total_voltage_drop))
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 10, QTableWidgetItem(pre_V_Drop))
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 11, QTableWidgetItem(load_type))
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 12, QTableWidgetItem(phase))
+
+            print(":)")
+            #pdb.set_trace()
+        else:
+            #pdb.set_trace()
+            print(":(")
+
+    def saveVoltageDrop(self):
+        pass
+        #current_circuit = {'Length':[],'Wire_Type':[], 'Load_type':[],'Phase':[],'wire_insulation':[],'wire_size':[],'Num_of_lum':[{'Lum_name':[],'lum_QTY':[]}]}
+        #current_circuit['Num_of_lum'][0]['Lum_name'] to access all of the values in this directry
+        #pdb.set_trace()
