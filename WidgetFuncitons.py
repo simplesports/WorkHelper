@@ -203,6 +203,7 @@ class VoltageDrop(QWidget):
         self.VoltageDropGUI.comboBox_Phase.activated[str].connect(self.WireSelect_Voltage_Drop)
         self.VoltageDropGUI.Button_Save.clicked.connect(self.saveVoltageDrop)
         self.VoltageDropGUI.Button_Add_To_Table.clicked.connect(self.addToTable)
+        self.VoltageDropGUI.Button_Save.clicked.connect(self.saveVoltageDrop)
 
 
     def phaseTotalShow(self):
@@ -467,11 +468,17 @@ class VoltageDrop(QWidget):
             print(":)")
             #pdb.set_trace()
         else:
-            #pdb.set_trace()
+            #Write code to set an error dialog box
             print(":(")
 
     def saveVoltageDrop(self):
-        pass
-        #current_circuit = {'Length':[],'Wire_Type':[], 'Load_type':[],'Phase':[],'wire_insulation':[],'wire_size':[],'Num_of_lum':[{'Lum_name':[],'lum_QTY':[]}]}
-        #current_circuit['Num_of_lum'][0]['Lum_name'] to access all of the values in this directry
-        #pdb.set_trace()
+
+        #try:
+            if len(self.VoltageDropGUI.UserInput_Panel_Name.text()) > 0:
+                Functions.Voltage_Drop_Panels.update({self.VoltageDropGUI.UserInput_Panel_Name.text():self.current_Panel,'Panel_Voltage':self.VoltageDropGUI.comboBox_Panel_Voltage.currentText()})
+                #newEntry = QListWidgetItem(self.VoltageDropGUI.UserInput_Panel_Name.text())
+                #MainUi.listBox_Voltage_Drop.addItem(newEntry)
+                
+                pdb.set_trace()
+        #except:
+            #pass

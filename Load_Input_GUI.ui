@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LoadInput</class>
+ <widget class="QWidget" name="LoadInput">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>707</width>
+    <height>695</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="groupBox_UserInput">
+     <property name="title">
+      <string>Load Input</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <layout class="QHBoxLayout" name="GroupBoxLayOut_top_hoz">
+        <item>
+         <widget class="QLabel" name="Text_Load_Name">
+          <property name="text">
+           <string>Load Name:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="UserInput_Load_Name"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="Text_Voltage">
+          <property name="text">
+           <string>Voltage:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBox_Voltage"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="GroupBoxLayOut_bottom_hoz">
+        <item>
+         <widget class="QLabel" name="Text_Wattage">
+          <property name="text">
+           <string>Wattage:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="UserInput_Wattage"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="Text_Power_Factor">
+          <property name="text">
+           <string>Power Factor:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="UserInput_Power_Factor"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="Text_VA">
+          <property name="text">
+           <string>VA:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="Text_VA_RESULTS">
+          <property name="text">
+           <string>0</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="Text_Utility">
+          <property name="text">
+           <string>Utility:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBox_Utility"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <layout class="QHBoxLayout" name="Middle_LayOut_hoz">
+     <item>
+      <widget class="QTableWidget" name="tableWidget">
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
+       <property name="selectionBehavior">
+        <enum>QAbstractItemView::SelectRows</enum>
+       </property>
+       <property name="columnCount">
+        <number>6</number>
+       </property>
+       <column/>
+       <column/>
+       <column/>
+       <column/>
+       <column/>
+       <column/>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="0">
+    <layout class="QHBoxLayout" name="Top2_LayOut_hoz">
+     <item>
+      <widget class="QPushButton" name="Button_Add_To_Window">
+       <property name="text">
+        <string>Add To Window</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Button_Modify_Load">
+       <property name="text">
+        <string>Modify Load</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Button_Remove_Load">
+       <property name="text">
+        <string>Remove Load</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>UserInput_Load_Name</tabstop>
+  <tabstop>UserInput_Wattage</tabstop>
+  <tabstop>UserInput_Power_Factor</tabstop>
+  <tabstop>tableWidget</tabstop>
+  <tabstop>Button_Add_To_Window</tabstop>
+  <tabstop>Button_Modify_Load</tabstop>
+  <tabstop>Button_Remove_Load</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>
