@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtCore import QCoreApplication
+from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from Load_Input_GUI import *
@@ -172,6 +172,7 @@ class LoadInput(QWidget):
 
 
 class VoltageDrop(QWidget):
+    VoltageDropSignal = pyqtSignal()
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
 
@@ -203,8 +204,6 @@ class VoltageDrop(QWidget):
         self.VoltageDropGUI.comboBox_Phase.activated[str].connect(self.WireSelect_Voltage_Drop)
         self.VoltageDropGUI.Button_Save.clicked.connect(self.saveVoltageDrop)
         self.VoltageDropGUI.Button_Add_To_Table.clicked.connect(self.addToTable)
-        self.VoltageDropGUI.Button_Save.clicked.connect(self.saveVoltageDrop)
-
 
     def phaseTotalShow(self):
 
@@ -472,13 +471,15 @@ class VoltageDrop(QWidget):
             print(":(")
 
     def saveVoltageDrop(self):
-
+            tempVoltageDropValues = {}
         #try:
             if len(self.VoltageDropGUI.UserInput_Panel_Name.text()) > 0:
-                Functions.Voltage_Drop_Panels.update({self.VoltageDropGUI.UserInput_Panel_Name.text():self.current_Panel,'Panel_Voltage':self.VoltageDropGUI.comboBox_Panel_Voltage.currentText()})
+                tempVoltageDropValues.update({'panelInfo':self.current_Panel,'Panel_Voltage':self.VoltageDropGUI.comboBox_Panel_Voltage.currentText()})
+                Functions.Voltage_Drop_Panels.update({self.VoltageDropGUI.UserInput_Panel_Name.text():tempVoltageDropValues})
                 #newEntry = QListWidgetItem(self.VoltageDropGUI.UserInput_Panel_Name.text())
                 #MainUi.listBox_Voltage_Drop.addItem(newEntry)
-                
-                pdb.set_trace()
+
+            self.VoltageDropSignal.emit()
+
         #except:
             #pass

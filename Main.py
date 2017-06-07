@@ -48,6 +48,7 @@ class MainWindow(QMainWindow):
         subVoltage.setWidget(Voltage_Drop)
         subVoltage.setObjectName("Voltage_Drop_window")
         subVoltage.setWindowTitle("Voltage Drop Calculator")
+        Voltage_Drop.VoltageDropSignal.connect(self.updateVoltageDrop)
         self.MainUi.mdiArea.addSubWindow(subVoltage)
         subVoltage.show()
 
@@ -86,6 +87,12 @@ class MainWindow(QMainWindow):
 
     def updateVoltageDrop(self):
         print("made it")
+        #pdb.set_trace()
+        for i in Functions.Voltage_Drop_Panels:
+            self.MainUi.listBox_Voltage_Drop.addItem(i)
+            #pdb.set_trace()
+        #self.MainUi.listBox_Voltage_Drop.addItem(newEntry)
+
 
 
 
