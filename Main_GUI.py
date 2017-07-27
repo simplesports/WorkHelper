@@ -53,6 +53,15 @@ class Ui_MainWindow(object):
         self.listBox_Voltage_Drop = QtWidgets.QListWidget(self.groupBox_Voltage_Drop_Calc)
         self.listBox_Voltage_Drop.setObjectName("listBox_Voltage_Drop")
         self.verticalLayout_3.addWidget(self.listBox_Voltage_Drop)
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.Button_Export_Voltage_Calc = QtWidgets.QPushButton(self.groupBox_Voltage_Drop_Calc)
+        self.Button_Export_Voltage_Calc.setObjectName("Button_Export_Voltage_Calc")
+        self.horizontalLayout_2.addWidget(self.Button_Export_Voltage_Calc)
+        self.Button_Export_All_Voltage_Calc = QtWidgets.QPushButton(self.groupBox_Voltage_Drop_Calc)
+        self.Button_Export_All_Voltage_Calc.setObjectName("Button_Export_All_Voltage_Calc")
+        self.horizontalLayout_2.addWidget(self.Button_Export_All_Voltage_Calc)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_2)
         self.verticalLayout_2.addWidget(self.groupBox_Voltage_Drop_Calc)
         self.groupBox_Panel_Schedule = QtWidgets.QGroupBox(self.groupBox_ProjectList)
         self.groupBox_Panel_Schedule.setObjectName("groupBox_Panel_Schedule")
@@ -224,6 +233,8 @@ class Ui_MainWindow(object):
         self.groupBox_Voltage_Drop_Calc.setTitle(_translate("MainWindow", "Voltage Drop Calculation(s)"))
         self.Button_New_Voltage_Drop_Calc.setText(_translate("MainWindow", "New Voltage Drop Calculation"))
         self.Button_Remove_Voltage_Drop_calc.setText(_translate("MainWindow", "Remove Voltage Drop Calculation"))
+        self.Button_Export_Voltage_Calc.setText(_translate("MainWindow", "Export Calculation to Excel"))
+        self.Button_Export_All_Voltage_Calc.setText(_translate("MainWindow", "Export All Calculations to Excel"))
         self.groupBox_Panel_Schedule.setTitle(_translate("MainWindow", "Panel Schedule(s)"))
         self.Button_New_Panel_Schedule.setText(_translate("MainWindow", "New Panel Schedule"))
         self.Button_Remove_Panel_Schedule.setText(_translate("MainWindow", "Remove Panel Schedule"))
@@ -266,3 +277,14 @@ class Ui_MainWindow(object):
         self.actionFull_List.setText(_translate("MainWindow", "Colorado"))
         self.actionSaveAs.setText(_translate("MainWindow", "Save As"))
         self.actionSave.setText(_translate("MainWindow", "Save"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec_())
+

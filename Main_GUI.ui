@@ -81,6 +81,24 @@
            <item>
             <widget class="QListWidget" name="listBox_Voltage_Drop"/>
            </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <widget class="QPushButton" name="Button_Export_Voltage_Calc">
+               <property name="text">
+                <string>Export Calculation to Excel</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="Button_Export_All_Voltage_Calc">
+               <property name="text">
+                <string>Export All Calculations to Excel</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
           </layout>
          </widget>
         </item>
