@@ -395,13 +395,16 @@ class VoltageDrop(QWidget):
 
     def Voltage_Drop_Calc(self,Distance,wireType,Phase,Current,circuitVoltage,WireSizeIndex):
         #This is just the pure VoltageDrop Calculation
+        if Distance == '':
+            Distance = 0
+
         VoltageDrop = round((self.PhaseCheck(Phase) * self.CUorAL(wireType) * float(Current) * float(Distance))/Functions.wireSizeCircularMill[WireSizeIndex],2)
+
         VoltageDropPre = VoltageDrop/float(circuitVoltage)
         return [VoltageDrop,VoltageDropPre]
 
     def WireSelect_Voltage_Drop(self):
-        #print('made it')
-        #pdb.set_trace()
+
         if self.VoltageDropGUI.Button_Show_more_Options.text() =='Hide Options':
             Distance = self.VoltageDropGUI.UserInput_Length.text()
             wireType = self.VoltageDropGUI.comboBox_Wire_Type.currentText()
@@ -416,10 +419,15 @@ class VoltageDrop(QWidget):
             self.VoltageDropGUI.Text_Wire_Size_RESULTS.setText(self.VoltageDropGUI.comboBox_Wire_Size.currentText())
 
     def addToTable(self):
-#To add: check if the same circuit number is entered and deny it
-#change order so that wire size if closer to the front
+#To add:
+#change order of table so that wire size is closer to the front
 # add the total amount to the bottom phase boxes
-        if len(self.VoltageDropGUI.UserInput_Circuit_Number.text()) > 0:
+        Check = self.errorCheck_addToTable()
+
+        ErrorFree = Check[0]
+        ErrorMessage = Check[1]
+
+        if ErrorFree == 1:
 
             circuitNumber = self.VoltageDropGUI.UserInput_Circuit_Number.text()
             length = self.VoltageDropGUI.UserInput_Length.text()
@@ -464,11 +472,95 @@ class VoltageDrop(QWidget):
             self.VoltageDropGUI.tableWidget.setItem(rowPosition, 11, QTableWidgetItem(load_type))
             self.VoltageDropGUI.tableWidget.setItem(rowPosition, 12, QTableWidgetItem(phase))
 
-            print(":)")
-            #pdb.set_trace()
+            self.VoltageDropGUI.UserInput_Circuit_Number.setText("")
+            self.VoltageDropGUI.UserInput_Length.setText("")
+            self.VoltageDropGUI.text_Circuit_Number.setStyleSheet("color: black")
+            self.VoltageDropGUI.text_Length.setStyleSheet("color: black")
+
+            self.updateTotalPhaseLoad(int(circuitNumber))
+
+
         else:
-            #Write code to set an error dialog box
+            #Make sure to add an error so that they can't type in a circuit greater than 80
+            QMessageBox.about(self, "Something isn't right", ErrorMessage)
+
             print(":(")
+
+    def updateTotalPhaseLoad(self,cktNumber):
+        totalPhase1VA = 0
+        totalPhase2VA = 0
+        if self.VoltageDropGUI.comboBox_Panel_Voltage.currentText() == "120/240V-1PH-3W" or self.VoltageDropGUI.comboBox_Panel_Voltage.currentText() == "240/480-1PH-3W":
+
+            for row in range(self.VoltageDropGUI.tableWidget.rowCount()):
+                cktNumber = int(self.VoltageDropGUI.tableWidget.item(row,0).text())
+                if cktNumber in Functions.phase1:
+                    currentPhase1VA = int(self.VoltageDropGUI.tableWidget.item(row,2).text())
+                    totalPhase1VA = totalPhase1VA + currentPhase1VA
+                else:
+                    currentPhase2VA = int(self.VoltageDropGUI.tableWidget.item(row,2).text())
+                    totalPhase2VA = totalPhase2VA + currentPhase2VA
+
+            self.VoltageDropGUI.UserInput_Phase_A.setText(str(totalPhase1VA))
+            self.VoltageDropGUI.UserInput_Phase_C.setText(str(totalPhase2VA))
+        else:
+            pass
+            # This section will be for the 3 phase panels.
+
+    def errorCheck_addToTable(self):
+        goodToGo = 1
+        message = ''
+
+        if len(self.VoltageDropGUI.UserInput_Circuit_Number.text()) == 0 and len(self.VoltageDropGUI.UserInput_Length.text()) == 0:
+            self.VoltageDropGUI.text_Circuit_Number.setStyleSheet("color: red")
+            self.VoltageDropGUI.text_Length.setStyleSheet("color: red")
+            message = 'You need to enter a unique circuit number and a distance.'
+            goodToGo = 0
+            return [goodToGo,message]
+        elif len(self.VoltageDropGUI.UserInput_Circuit_Number.text()) == 0:
+            self.VoltageDropGUI.text_Circuit_Number.setStyleSheet("color: red")
+            self.VoltageDropGUI.text_Length.setStyleSheet("color: black")
+            message = 'You need to enter a unique circuit number'
+            goodToGo = 0
+            return [goodToGo,message]
+        elif len(self.VoltageDropGUI.UserInput_Length.text()) == 0:
+            self.VoltageDropGUI.text_Length.setStyleSheet("color: red")
+            self.VoltageDropGUI.text_Circuit_Number.setStyleSheet("color: black")
+            message = 'You need to enter a distance for this circuit'
+            goodToGo = 0
+            return [goodToGo,message]
+
+        try:
+            cktNumber = int(self.VoltageDropGUI.UserInput_Circuit_Number.text())
+        except:
+            goodToGo = 0
+            message = 'The circuit number must only be a whole number'
+            self.VoltageDropGUI.text_Circuit_Number.setStyleSheet("color: red")
+            self.VoltageDropGUI.text_Length.setStyleSheet("color: black")
+            return [goodToGo,message]
+
+        try:
+            distance = int(self.VoltageDropGUI.UserInput_Length.text())
+        except:
+            goodToGo = 0
+            message = 'The Distance must be a whole number. Round up if you have to'
+            self.VoltageDropGUI.text_Length.setStyleSheet("color: red")
+            self.VoltageDropGUI.text_Circuit_Number.setStyleSheet("color: black")
+            return [goodToGo,message]
+
+
+        items = self.VoltageDropGUI.tableWidget.findItems(self.VoltageDropGUI.UserInput_Circuit_Number.text(), Qt.MatchExactly)
+        for i in range(0, len(items)):
+            if items[i].column() == 0:
+                if items[i].text() == self.VoltageDropGUI.UserInput_Circuit_Number.text():
+                    goodToGo = 0
+                    message = 'You need to have a unique circuit number. This one is already taken'
+                    self.VoltageDropGUI.text_Circuit_Number.setStyleSheet("color: red")
+                    self.VoltageDropGUI.text_Length.setStyleSheet("color: black")
+                    break
+
+
+        return [goodToGo,message]
+
 
     def saveVoltageDrop(self):
             tempVoltageDropValues = {}
@@ -479,7 +571,6 @@ class VoltageDrop(QWidget):
                 #newEntry = QListWidgetItem(self.VoltageDropGUI.UserInput_Panel_Name.text())
                 #MainUi.listBox_Voltage_Drop.addItem(newEntry)
 
-            self.VoltageDropSignal.emit()
-
+                self.VoltageDropSignal.emit()
         #except:
             #pass

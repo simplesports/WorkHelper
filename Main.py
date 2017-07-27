@@ -59,7 +59,8 @@ class MainWindow(QMainWindow):
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getSaveFileName(self,"QFileDialog.getSaveFileName()","","All Files (*);;Text Files (*.txt)", options=options)
 
-        data = json.dumps(['Loads',Functions.Loads])
+        data = json.dumps(['Loads',Functions.Loads,'Panels',Functions.Voltage_Drop_Panels])
+        pdb.set_trace()
         try:
             with ZipFile(fileName, 'w') as myzip:
                 myzip.writestr('digest.json', data)
@@ -84,16 +85,17 @@ class MainWindow(QMainWindow):
         except:
             pass
 
+        try:
+            Functions.Voltage_Drop_Panels = newdata[3]
+            self.updateVoltageDrop()
+        except:
+            pass
+
 
     def updateVoltageDrop(self):
-        print("made it")
-        #pdb.set_trace()
+
         for i in Functions.Voltage_Drop_Panels:
             self.MainUi.listBox_Voltage_Drop.addItem(i)
-            #pdb.set_trace()
-        #self.MainUi.listBox_Voltage_Drop.addItem(newEntry)
-
-
 
 
 if __name__ == "__main__":

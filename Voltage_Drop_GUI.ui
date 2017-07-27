@@ -26,6 +26,18 @@
    </item>
    <item row="3" column="2" colspan="2">
     <widget class="QTableWidget" name="tableWidget">
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="tabKeyNavigation">
+      <bool>false</bool>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
      <column>
       <property name="text">
        <string>Circuit Number</string>
@@ -273,7 +285,7 @@
       <item row="6" column="0" colspan="2">
        <widget class="QPushButton" name="Button_Add_To_Table">
         <property name="text">
-         <string>Add to Table</string>
+         <string>Add to Panel</string>
         </property>
        </widget>
       </item>
