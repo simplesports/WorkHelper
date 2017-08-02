@@ -207,9 +207,12 @@ class VoltageDrop(QWidget):
         self.VoltageDropGUI.tableWidget.doubleClicked.connect(self.reloadData_editCircuit)
         self.VoltageDropGUI.Button_Update_Circuit.clicked.connect(self.Update_Circuit)
         self.VoltageDropGUI.Button_Cancel.clicked.connect(self.cancel_Update)
+        self.VoltageDropGUI.Button_Remove_Circuit.clicked.connect(self.remove_circuit)
+        self.VoltageDropGUI.Button_Update_Panel.clicked.connect(self.updatePanel)
 
         self.VoltageDropGUI.Button_Update_Circuit.hide()
         self.VoltageDropGUI.Button_Cancel.hide()
+        self.VoltageDropGUI.Button_Update_Panel.hide()
 
     def phaseTotalShow(self):
 
@@ -492,9 +495,30 @@ class VoltageDrop(QWidget):
 
             #print(":(")
 
+    def remove_circuit(self):
+
+        try:
+            model = self.VoltageDropGUI.tableWidget
+            index_list = []
+            for model_index in self.VoltageDropGUI.tableWidget.selectionModel().selectedRows():
+                index = QtCore.QPersistentModelIndex(model_index)
+                index_list.append(index)
+
+            for index in index_list:
+                self.current_Panel['cktNumber'].pop(index.row())
+                self.current_Panel['cktInfo'].pop(index.row())
+                model.removeRow(index.row())
+
+        except:
+            pass
+
+
+        self.updateTotalPhaseLoad()
     def updateTotalPhaseLoad(self):
         totalPhase1VA = 0
         totalPhase2VA = 0
+        totalPhase3VA = 0
+
         if self.VoltageDropGUI.comboBox_Panel_Voltage.currentText() == "120/240V-1PH-3W" or self.VoltageDropGUI.comboBox_Panel_Voltage.currentText() == "240/480-1PH-3W":
 
             for row in range(self.VoltageDropGUI.tableWidget.rowCount()):
@@ -509,12 +533,27 @@ class VoltageDrop(QWidget):
             self.VoltageDropGUI.UserInput_Phase_A.setText(str(totalPhase1VA))
             self.VoltageDropGUI.UserInput_Phase_C.setText(str(totalPhase2VA))
         else:
-            pass
-            # This section will be for the 3 phase panels.
+            for row in range(self.VoltageDropGUI.tableWidget.rowCount()):
+                cktNumber = int(self.VoltageDropGUI.tableWidget.item(row,0).text())
+                if cktNumber in Functions.phaseA:
+                    currentPhase1VA = int(self.VoltageDropGUI.tableWidget.item(row,2).text())
+                    totalPhase1VA = totalPhase1VA + currentPhase1VA
+                elif cktNumber in Functions.phaseB:
+                    currentPhase2VA = int(self.VoltageDropGUI.tableWidget.item(row,2).text())
+                    totalPhase2VA = totalPhase2VA + currentPhase2VA
+                else:
+                    currentPhase3VA = int(self.VoltageDropGUI.tableWidget.item(row,2).text())
+                    totalPhase3VA = totalPhase3VA + currentPhase3VA
+
+            self.VoltageDropGUI.UserInput_Phase_A.setText(str(totalPhase1VA))
+            self.VoltageDropGUI.UserInput_Phase_B.setText(str(totalPhase2VA))
+            self.VoltageDropGUI.UserInput_Phase_C.setText(str(totalPhase3VA))
+
 
     def reloadData_editCircuit(self):
         global editIndex
         global editRow
+        global editedCircuit
 
         #Get values from table****************************************************************************************************
         #
@@ -523,6 +562,7 @@ class VoltageDrop(QWidget):
         row = self.VoltageDropGUI.tableWidget.currentRow()
         editRow = row
         cktNumber = self.VoltageDropGUI.tableWidget.item(row,0).text()
+        editedCircuit = cktNumber
         Length = self.VoltageDropGUI.tableWidget.item(row,1).text()
         wireSize = self.VoltageDropGUI.tableWidget.item(row,5).text()
         wireType = self.VoltageDropGUI.tableWidget.item(row,6).text()
@@ -584,7 +624,7 @@ class VoltageDrop(QWidget):
         #***************************************************************************************************************************
         #pdb.set_trace()
     def Update_Circuit(self):
-        #set variable mode to 1 to avoid it checking for the same circuit number, but change the error so that it saves the original ckt number and will compare the rest.
+        #set variable mode to 1 to avoid it checking for the same circuit number, but it will know that your repeating the original circuit.
         Check = self.errorCheck_addToTable(1)
 
         ErrorFree = Check[0]
@@ -696,6 +736,9 @@ class VoltageDrop(QWidget):
         self.VoltageDropGUI.comboBox_Wire_Insulation.setCurrentIndex(1)
         self.VoltageDropGUI.comboBox_Wire_Size.setCurrentIndex(1)
 
+        self.VoltageDropGUI.text_Length.setStyleSheet("color: black")
+        self.VoltageDropGUI.text_Circuit_Number.setStyleSheet("color: black")
+
     def errorCheck_addToTable(self,mode=0):
         goodToGo = 1
         message = ''
@@ -718,6 +761,22 @@ class VoltageDrop(QWidget):
             message = 'You need to enter a distance for this circuit'
             goodToGo = 0
             return [goodToGo,message]
+
+        if self.VoltageDropGUI.comboBox_Panel_Voltage.currentText() == "120/240V-1PH-3W" or self.VoltageDropGUI.comboBox_Panel_Voltage.currentText() == "240/480-1PH-3W":
+            if int(self.VoltageDropGUI.UserInput_Circuit_Number.text()) > 80:
+                goodToGo = 0
+                message = 'The circuits for a single phase panel can not exceed 80 spaces'
+                self.VoltageDropGUI.text_Circuit_Number.setStyleSheet("color: red")
+                self.VoltageDropGUI.text_Length.setStyleSheet("color: black")
+                return [goodToGo,message]
+
+        else:
+            if int(self.VoltageDropGUI.UserInput_Circuit_Number.text()) > 84:
+                goodToGo = 0
+                message = 'The circuits for a three phase panel can not exceed 84 spaces'
+                self.VoltageDropGUI.text_Circuit_Number.setStyleSheet("color: red")
+                self.VoltageDropGUI.text_Length.setStyleSheet("color: black")
+                return [goodToGo,message]
 
         try:
             cktNumber = int(self.VoltageDropGUI.UserInput_Circuit_Number.text())
@@ -747,7 +806,19 @@ class VoltageDrop(QWidget):
                         self.VoltageDropGUI.text_Circuit_Number.setStyleSheet("color: red")
                         self.VoltageDropGUI.text_Length.setStyleSheet("color: black")
                         break
+            return [goodToGo,message]
 
+        if mode == 1:
+            items = self.VoltageDropGUI.tableWidget.findItems(self.VoltageDropGUI.UserInput_Circuit_Number.text(), Qt.MatchExactly)
+            for i in range(0, len(items)):
+                if items[i].column() == 0:
+                    if items[i].text() == self.VoltageDropGUI.UserInput_Circuit_Number.text() and items[i].text() != editedCircuit:
+                        goodToGo = 0
+                        message = 'You need to have a unique circuit number. This one is already taken'
+                        self.VoltageDropGUI.text_Circuit_Number.setStyleSheet("color: red")
+                        self.VoltageDropGUI.text_Length.setStyleSheet("color: black")
+                        break
+            return [goodToGo,message]
 
         return [goodToGo,message]
 
@@ -764,3 +835,44 @@ class VoltageDrop(QWidget):
                 self.VoltageDropSignal.emit()
         #except:
             #pass
+
+    def editPanel(self,panelName):
+        #print('In Edit Panel Mode for: '+panelName)
+        self.VoltageDropGUI.Button_Save.hide()
+        self.VoltageDropGUI.Button_Update_Panel.show()
+        self.VoltageDropGUI.UserInput_Panel_Name.setText(panelName)
+        self.current_Panel = Functions.Voltage_Drop_Panels[panelName]['panelInfo']
+
+        for i in range(0,len(self.current_Panel['cktNumber'])):
+
+            circuitNumber = self.current_Panel['cktNumber'][i]
+            length = self.current_Panel['cktInfo'][i]['Length']
+            total_VA = self.current_Panel['cktInfo'][i]['total_VA']
+            circuitVoltage = self.current_Panel['cktInfo'][i]['circuit_Voltage']
+            current = self.current_Panel['cktInfo'][i]['current']
+            wire_size = self.current_Panel['cktInfo'][i]['wire_size']
+            wire_type = self.current_Panel['cktInfo'][i]['wire_type']
+            wire_insulation = self.current_Panel['cktInfo'][i]['wire_insulation']
+            phase = self.current_Panel['cktInfo'][i]['phase']
+            total_voltage_drop = self.current_Panel['cktInfo'][i]['total_voltage_drop']
+            pre_V_Drop = self.current_Panel['cktInfo'][i]['pre_V_Drop']
+            load_type = self.current_Panel['cktInfo'][i]['load_type']
+
+            rowPosition = self.VoltageDropGUI.tableWidget.rowCount()
+            self.VoltageDropGUI.tableWidget.insertRow(rowPosition)
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 0, QTableWidgetItem(circuitNumber))
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 1, QTableWidgetItem(length))
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 2, QTableWidgetItem(total_VA))
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 3, QTableWidgetItem(circuitVoltage))
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 4, QTableWidgetItem(current))
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 5, QTableWidgetItem(wire_size))
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 6, QTableWidgetItem(wire_type))
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 7, QTableWidgetItem(wire_insulation))
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 8, QTableWidgetItem(phase))
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 9, QTableWidgetItem(total_voltage_drop))
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 10, QTableWidgetItem(pre_V_Drop))
+            self.VoltageDropGUI.tableWidget.setItem(rowPosition, 11, QTableWidgetItem(load_type))
+
+    def updatePanel(self):
+        #self.MainUi.mdiArea.closeActiveSubWindow()
+        pass

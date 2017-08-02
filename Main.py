@@ -22,11 +22,14 @@ class MainWindow(QMainWindow):
     def setUpMainUiFunction(self):
         #Here is where all of the button functions will be definded
         self.MainUi.pushButton_Add_Lum_Load.clicked.connect(self.showLoadInput)
-        self.MainUi.Button_New_Voltage_Drop_Calc.clicked.connect(self.showVoltageDrop)
+        self.MainUi.Button_New_Voltage_Drop_Calc.clicked.connect(self.newVoltageDrop)
         self.MainUi.actionSaveAs.triggered.connect(self.saveAs)
         self.MainUi.actionSaveAs.setShortcut('Ctrl+Shift+S')
         self.MainUi.actionOpen.triggered.connect(self.open)
         self.MainUi.actionOpen.setShortcut('Ctrl+O')
+
+        self.MainUi.listBox_Voltage_Drop.doubleClicked.connect(self.OpenVoltageDrop)
+
 
     def setUpToolBar(self):
         LoadButton = QAction(QIcon("Icons/light.png"),'Edit Project Luminaries', self)
@@ -42,7 +45,7 @@ class MainWindow(QMainWindow):
         self.MainUi.mdiArea.addSubWindow(sub)
         sub.show()
 
-    def showVoltageDrop(self):
+    def newVoltageDrop(self):
         subVoltage = QtWidgets.QMdiSubWindow()
         Voltage_Drop = VoltageDrop()
         subVoltage.setWidget(Voltage_Drop)
@@ -51,6 +54,24 @@ class MainWindow(QMainWindow):
         Voltage_Drop.VoltageDropSignal.connect(self.updateVoltageDrop)
         self.MainUi.mdiArea.addSubWindow(subVoltage)
         subVoltage.show()
+
+    def OpenVoltageDrop(self):
+        #print('worked')
+        row = self.MainUi.listBox_Voltage_Drop.currentRow()
+        Panel = self.MainUi.listBox_Voltage_Drop.item(row)
+        #print(Panel.text())
+
+        subVoltage = QtWidgets.QMdiSubWindow()
+        Voltage_Drop = VoltageDrop()
+        subVoltage.setWidget(Voltage_Drop)
+        subVoltage.setObjectName("Voltage_Drop_window")
+        subVoltage.setWindowTitle("Voltage Drop Calculator")
+        #Voltage_Drop.VoltageDropSignal.connect(self.updateVoltageDrop)
+        self.MainUi.mdiArea.addSubWindow(subVoltage)
+        Voltage_Drop.editPanel(Panel.text())
+
+        subVoltage.show()
+        #pdb.set_trace()
 
     def saveAs(self):
         #data = json.dumps(['foo', {'bar': ('baz', None, 1.0, 2)}])

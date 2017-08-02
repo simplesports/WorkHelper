@@ -331,6 +331,13 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="Button_Update_Panel">
+       <property name="text">
+        <string>Update Panel</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item row="2" column="2" colspan="2">
